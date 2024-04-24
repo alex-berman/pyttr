@@ -15,7 +15,7 @@ print(
         )
 
 
-# Game of fetch, corresponding to Cooper (2023, p.55) (only first function)
+# Game of fetch, corresponding to Cooper (2023, p.55)
 pick_up = Pred('pick_up', [Ind, Ind])
 attract_attention = Pred('attract_attention', [Ind, Ind])
 f1 = Fun('r',
@@ -32,9 +32,9 @@ f2 = Fun('r',
              RecType({'agenda': SingletonType(ListType(Ty), [
                  {'e': PType(attract_attention, ['a', 'b'])}
              ])})))
-state_0 = RecType({'agenda': SingletonType(ListType(Ty), [])}) # Initial state
-state_1 = f1.app(state_0) # State after applying f1
-state_2 = f2.app(state_1).app(RecType({'e': PType(pick_up, ['a', 'c'])})) # State after applying f2 and pick-up event
+state_0 = RecType({'agenda': SingletonType(ListType(Ty), [])})  # Initial state
+state_1 = f1.app(state_0)  # State after applying f1
+state_2 = f2.app(state_1).app(RecType({'e': PType(pick_up, ['a', 'c'])}))  # State after applying f2 and pick-up event
 print(show(state_1))
 print(show(state_2))
 
