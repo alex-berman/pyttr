@@ -1,4 +1,5 @@
 from ttrtypes import BType, PType, Pred, ListType, SingletonType, RecType, Ty, Re, Fun
+from actionrules import ActionRule, TypeJudgementAct, CreationAct
 from utils import show
 
 
@@ -22,13 +23,14 @@ throw = Pred('throw', [Ind, Ind])
 run_after = Pred('run_after', [Ind, Ind])
 return_pred = Pred('return', [Ind, Ind, Ind])
 
-f1 = Fun('r',
+update_functions = {
+    Fun('r',
          RecType({'agenda': SingletonType(ListType(Ty), [])}),
          RecType({'agenda': SingletonType(ListType(Ty), [
              {'e': PType(pick_up, ['a', 'c'])}
-         ])}))
+         ])})),
 
-f2 = Fun('r',
+    Fun('r',
          RecType({'agenda': SingletonType(ListType(Ty), [
              {'e': PType(pick_up, ['a', 'c'])}
          ])}),
@@ -36,9 +38,9 @@ f2 = Fun('r',
              RecType({'e': PType(pick_up, ['a', 'c'])}),
              RecType({'agenda': SingletonType(ListType(Ty), [
                  {'e': PType(attract_attention, ['a', 'b'])}
-             ])})))
+             ])}))),
 
-f3 = Fun('r',
+    Fun('r',
          RecType({'agenda': SingletonType(ListType(Ty), [
              {'e': PType(attract_attention, ['a', 'b'])}
          ])}),
@@ -46,9 +48,9 @@ f3 = Fun('r',
              RecType({'e': PType(attract_attention, ['a', 'b'])}),
              RecType({'agenda': SingletonType(ListType(Ty), [
                  {'e': PType(throw, ['a', 'c'])}
-             ])})))
+             ])}))),
 
-f4 = Fun('r',
+    Fun('r',
          RecType({'agenda': SingletonType(ListType(Ty), [
              {'e': PType(run_after, ['b', 'c'])}
          ])}),
@@ -56,31 +58,105 @@ f4 = Fun('r',
              RecType({'e': PType(run_after, ['b', 'c'])}),
              RecType({'agenda': SingletonType(ListType(Ty), [
                  {'e': PType(pick_up, ['b', 'c'])}
-             ])})))
+             ])}))),
 
-f5 = Fun('r',
+    Fun('r',
          RecType({'agenda': SingletonType(ListType(Ty), [
              {'e': PType(return_pred, ['b', 'c', 'a'])}
          ])}),
          Fun('e',
              RecType({'e': PType(return_pred, ['b', 'c', 'a'])}),
-             RecType({'agenda': SingletonType(ListType(Ty), [])})))
-
-# Updated states with new functions
-state_0 = RecType({'agenda': SingletonType(ListType(Ty), [])})  # Initial state
-state_1 = f1.app(state_0)
-state_2 = f2.app(state_1).app(RecType({'e': PType(pick_up, ['a', 'c'])}))
-state_3 = f3.app(state_2).app(RecType({'e': PType(attract_attention, ['a', 'b'])}))
-state_4 = f4.app(state_3).app(RecType({'e': PType(run_after, ['b', 'c'])}))
-state_5 = f5.app(state_4).app(RecType({'e': PType(return_pred, ['b', 'c', 'a'])}))
-
-# Printing states
-print(show(state_1))
-print(show(state_2))
-print(show(state_3))
-print(show(state_4))
-print(show(state_5))
+             RecType({'agenda': SingletonType(ListType(Ty), [])}))),
+}
 
 
-# TODO:
-# - replace manual invocation of state transitions above with action rule(s)
+class EventCreation(ActionRule):
+    # Corresponds to Cooper (2023, p. 61), 54
+    @staticmethod
+    def argument_names():
+        return ['current_state']
+
+    @staticmethod
+    def preconditions(current_state):
+        return len(current_state.pathvalue('agenda')) > 0
+
+    @staticmethod
+    def effect(current_state):
+        agenda_fst = current_state.pathvalue('agenda')[0]
+        return CreationAct('current_event', RecType({'e': agenda_fst['e']}))
+
+
+class EventBasedUpdate(ActionRule):
+    # Corresponds to Cooper (2023, p. 61), 55a
+    @staticmethod
+    def argument_names():
+        return ['f', 'current_state', 'current_event']
+
+    @staticmethod
+    def preconditions(f, current_state, current_event):
+        return current_event is not None and \
+               isinstance(f.body, Fun) and f.validate_arg(current_state) and f.body.validate_arg(current_event)
+
+    @staticmethod
+    def effect(f, current_state, current_event):
+        return TypeJudgementAct('next_state', f.app(current_state).app(current_event))
+
+
+class TacitUpdate(ActionRule):
+    # Corresponds to Cooper (2023, p. 61), 55b
+    @staticmethod
+    def argument_names():
+        return ['f', 'current_state']
+
+    @staticmethod
+    def preconditions(f, current_state):
+        return isinstance(f.body, RecType) and f.validate_arg(current_state)
+
+    @staticmethod
+    def effect(f, current_state):
+        return TypeJudgementAct('next_state', f.app(current_state))
+
+
+action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
+
+def get_next_state(current_state, update_functions, action_rules, current_event=None):
+    # Assumptions:
+    # - There is either no current event or exactly one current event.
+    # - If the preconditions for an action rule hold, the rule is applied, unless the rule creates a current event and
+    #   a current event already exists.
+
+    for update_function in update_functions:
+        print('update_function=' + show(update_function))
+        def get_args(action_rule):
+            def get_arg(argument_name):
+                if argument_name == 'f':
+                    return update_function
+                elif argument_name == 'current_state':
+                    return current_state
+                elif argument_name == 'current_event':
+                    return current_event
+            return [get_arg(argument_name) for argument_name in action_rule.argument_names()]
+
+        for action_rule in action_rules:
+            print('action_rule='+action_rule.__name__)
+            args = get_args(action_rule)
+            if action_rule.preconditions(*args):
+                print('preconditions hold')
+                effect = action_rule.effect(*args)
+                if isinstance(effect, TypeJudgementAct):
+                    if effect.symbol == 'next_state':
+                        return effect.judged_type.create()
+                if isinstance(effect, CreationAct):
+                    if effect.symbol == 'current_event' and current_event is None:
+                        print('creating current event of type ' + show(effect.type_to_create))
+                        current_event = RecType({'e': effect.type_to_create.create()})
+                        return get_next_state(current_state, update_functions, action_rules, current_event)
+
+    raise Exception('Failed to get next state')
+
+
+state = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
+print('state', show(state))
+for _ in range(10):
+    state = get_next_state(state, update_functions, action_rules)
+    print('state', show(state))
