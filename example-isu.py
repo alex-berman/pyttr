@@ -121,6 +121,7 @@ action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
 
 def get_next_state(current_state, update_functions, action_rules, current_event=None):
     # Assumptions:
+    # - Action rules are tried in arbitrary order.
     # - There is either no current event or exactly one current event.
     # - If the preconditions for an action rule hold, the rule is applied, unless the rule creates a current event and
     #   a current event already exists.
