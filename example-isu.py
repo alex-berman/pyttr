@@ -27,42 +27,42 @@ update_functions = {
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [])}),
         RecType({'agenda': SingletonType(ListType(Ty), [
-            {'e': PType(pick_up, ['a', 'c'])}
+            RecType({'e': PType(pick_up, ['a', 'c'])})
         ])})),
 
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [
-            {'e': PType(pick_up, ['a', 'c'])}
+            RecType({'e': PType(pick_up, ['a', 'c'])})
         ])}),
         Fun('e',
             RecType({'e': PType(pick_up, ['a', 'c'])}),
             RecType({'agenda': SingletonType(ListType(Ty), [
-                {'e': PType(attract_attention, ['a', 'b'])}
+                RecType({'e': PType(attract_attention, ['a', 'b'])})
             ])}))),
 
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [
-            {'e': PType(attract_attention, ['a', 'b'])}
+            RecType({'e': PType(attract_attention, ['a', 'b'])})
         ])}),
         Fun('e',
             RecType({'e': PType(attract_attention, ['a', 'b'])}),
             RecType({'agenda': SingletonType(ListType(Ty), [
-                {'e': PType(throw, ['a', 'c'])}
+                RecType({'e': PType(throw, ['a', 'c'])})
             ])}))),
 
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [
-            {'e': PType(run_after, ['b', 'c'])}
+            RecType({'e': PType(run_after, ['b', 'c'])})
         ])}),
         Fun('e',
             RecType({'e': PType(run_after, ['b', 'c'])}),
             RecType({'agenda': SingletonType(ListType(Ty), [
-                {'e': PType(pick_up, ['b', 'c'])}
+                RecType({'e': PType(pick_up, ['b', 'c'])})
             ])}))),
 
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [
-            {'e': PType(return_pred, ['b', 'c', 'a'])}
+            RecType({'e': PType(return_pred, ['b', 'c', 'a'])})
         ])}),
         Fun('e',
             RecType({'e': PType(return_pred, ['b', 'c', 'a'])}),
