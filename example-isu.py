@@ -119,6 +119,7 @@ class TacitUpdate(ActionRule):
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
 
+
 def get_next_state(current_state, update_functions, action_rules, current_event=None):
     # Assumptions:
     # - Action rules are tried in arbitrary order.
@@ -127,7 +128,6 @@ def get_next_state(current_state, update_functions, action_rules, current_event=
     #   a current event already exists.
 
     for update_function in update_functions:
-        print('update_function=' + show(update_function))
         def get_args(action_rule):
             def get_arg(argument_name):
                 if argument_name == 'f':
@@ -139,10 +139,10 @@ def get_next_state(current_state, update_functions, action_rules, current_event=
             return [get_arg(argument_name) for argument_name in action_rule.argument_names()]
 
         for action_rule in action_rules:
-            print('action_rule='+action_rule.__name__)
             args = get_args(action_rule)
             if action_rule.preconditions(*args):
-                print('preconditions hold')
+                print('preconditions hold for ' + action_rule.__name__ + ' with update function ' +
+                      show(update_function))
                 effect = action_rule.effect(*args)
                 if isinstance(effect, TypeJudgementAct):
                     if effect.symbol == 'next_state':
