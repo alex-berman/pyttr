@@ -80,9 +80,8 @@ event_creation = ActionRule(
 event_based_update = ActionRule(
     # Corresponds to Cooper (2023, p. 61), 55a
     arguments=['f', 'current_state', 'current_event'],
-    preconditions=lambda f, current_state, current_event:\
-        current_event is not None and isinstance(f.body, Fun) and f.validate_arg(current_state) and \
-        f.body.validate_arg(current_event),
+    preconditions=lambda f, current_state, current_event: isinstance(f.body, Fun) and f.validate_arg(current_state) \
+        and f.body.validate_arg(current_event),
     effect=lambda f, current_state, current_event: TypeJudgementAct(
         'next_state', f.app(current_state).app(current_event))
 )
@@ -104,33 +103,45 @@ def get_next_state(current_state, update_functions, action_rules, current_event=
     # - If the preconditions for an action rule hold, the rule is applied, unless the rule creates a current event and
     #   a current event already exists.
 
-    for update_function in update_functions:
-        def get_args(action_rule):
-            def get_arg(argument_name):
-                if argument_name == 'f':
-                    return update_function
-                elif argument_name == 'current_state':
-                    return current_state
-                elif argument_name == 'current_event':
-                    return current_event
-            return [get_arg(argument_name) for argument_name in action_rule.arguments]
-
+    def enumerate_action_rules_and_args():
         for action_rule in action_rules:
-            args = get_args(action_rule)
-            if action_rule.preconditions(*args):
-                print('preconditions hold for ' + show(action_rule) + ' with update function ' +
-                      show(update_function))
-                effect = action_rule.effect(*args)
-                if isinstance(effect, TypeJudgementAct):
-                    if effect.symbol == 'next_state':
-                        return effect.judged_type.create()
-                elif isinstance(effect, CreationAct):
-                    if effect.symbol == 'current_event' and current_event is None:
-                        print('creating current event of type ' + show(effect.type_to_create))
-                        current_event = RecType({'e': effect.type_to_create.create()})
-                        return get_next_state(current_state, update_functions, action_rules, current_event)
-                else:
-                    raise Exception("Don't know how to handle rule effect " + str(effect))
+            def get_args(f=None):
+                def get_arg(argument_name):
+                    if argument_name == 'f':
+                        return f
+                    elif argument_name == 'current_state':
+                        return current_state
+                    elif argument_name == 'current_event':
+                        return current_event
+
+                return [get_arg(argument_name) for argument_name in action_rule.arguments]
+
+            if 'f' in action_rule.arguments:
+                for update_function in update_functions:
+                    args = get_args(update_function)
+                    if all(args):
+                        yield action_rule, args
+            else:
+                args = get_args()
+                if all(args):
+                    yield action_rule, args
+
+    for action_rule, args in enumerate_action_rules_and_args():
+        if action_rule.preconditions(*args):
+            print('preconditions hold for ' + show(action_rule) + ' with args ' + show(args))
+            effect = action_rule.effect(*args)
+            if isinstance(effect, TypeJudgementAct):
+                if effect.symbol == 'next_state':
+                    next_state = effect.judged_type.create()
+                    print('returning next state ' + show(next_state))
+                    return next_state
+            elif isinstance(effect, CreationAct):
+                if effect.symbol == 'current_event' and current_event is None:
+                    print('creating current event of type ' + show(effect.type_to_create))
+                    current_event = RecType({'e': effect.type_to_create.create()})
+                    return get_next_state(current_state, update_functions, action_rules, current_event)
+            else:
+                raise Exception("Don't know how to handle rule effect " + str(effect))
 
     raise Exception('Failed to get next state')
 
