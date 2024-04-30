@@ -4,11 +4,11 @@ class ActionRule:
         return []
 
     @staticmethod
-    def preconditions():
+    def preconditions(*args):
         return False
 
     @staticmethod
-    def effect():
+    def effect(*args):
         pass
 
 
