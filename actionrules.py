@@ -1,15 +1,15 @@
 class ActionRule:
-    def __init__(self, arguments, preconditions, effect):
-        self.arguments = arguments
-        self.preconditions = preconditions
-        self.effect = effect
+    def __init__(self, frame):
+        self.frame = frame
 
-    def show(self):
-        return "ActionRule(arguments=" + str(self.arguments) + ", preconditions=" + str(self.preconditions) + \
-               ", effect=" + str(self.effect) + ")"
+    def preconditions(self):
+        raise NotImplementedError()
+
+    def effect(self, **kwargs):
+        raise NotImplementedError()
 
 
-class TypeJudgementAct:
+class SpecificTypeJudgementAct:
     def __init__(self, symbol, judged_type):
         self.symbol = symbol
         self.judged_type = judged_type
