@@ -9,7 +9,8 @@ class TestFun(object):
              RecType({'agenda': SingletonType(ListType(Ty), [])}),
              'mock_body')
         valid_arg = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
-        invalid_arg = RecType({'agenda': SingletonType(ListType(Ty), [{'e': PType(pick_up, ['a', 'c'])}])}).create()
+        invalid_arg = RecType({'agenda': SingletonType(ListType(Ty), [
+            RecType({'e': PType(pick_up, ['a', 'c'])})])}).create()
         assert fun.validate_arg(valid_arg)
         assert not fun.validate_arg(invalid_arg)
 
@@ -17,9 +18,10 @@ class TestFun(object):
         Ind = BType('Ind')
         pick_up = Pred('pick_up', [Ind, Ind])
         fun = Fun('r',
-             RecType({'agenda': SingletonType(ListType(Ty), [{'e': PType(pick_up, ['a', 'c'])}])}),
+             RecType({'agenda': SingletonType(ListType(Ty), [RecType({'e': PType(pick_up, ['a', 'c'])})])}),
              'mock_body')
-        valid_arg = RecType({'agenda': SingletonType(ListType(Ty), [{'e': PType(pick_up, ['a', 'c'])}])}).create()
+        valid_arg = RecType({'agenda': SingletonType(ListType(Ty), [
+            RecType({'e': PType(pick_up, ['a', 'c'])})])}).create()
         invalid_arg = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
-        #assert fun.validate_arg(valid_arg) # Should work?
+        assert fun.validate_arg(valid_arg)
         assert not fun.validate_arg(invalid_arg)
