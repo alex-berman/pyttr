@@ -1,11 +1,11 @@
 class ActionRule:
-    def __init__(self, frame):
-        self.frame = frame
+    def __init__(self, kb):
+        self.kb = kb
 
     def preconditions(self):
         raise NotImplementedError()
 
-    def effect(self, **kwargs):
+    def effects(self, **kwargs):
         raise NotImplementedError()
 
 
@@ -22,3 +22,8 @@ class CreationAct:
 
     def __repr__(self):
         return "CreationAct(" + repr(self.symbol) + ", "  + repr(self.type_to_create) + ")"
+
+
+class ConsumeAct:
+    def __init__(self, symbol):
+        self.symbol = symbol

@@ -1,6 +1,7 @@
 from ttrtypes import BType, PType, Pred, ListType, SingletonType, RecType, Ty, Re, Fun
 from records import Rec
-from actionrules import ActionRule, SpecificTypeJudgementAct, CreationAct
+from actionrules import ActionRule, CreationAct, ConsumeAct
+from kb import KnowledgeBase
 from utils import show
 
 
@@ -78,50 +79,53 @@ update_functions = {
             RecType({'agenda': SingletonType(ListType(Ty), [])}))),
 }
 
-
-frame = Rec({
-    'current_state': RecType({'agenda': SingletonType(ListType(Ty), [])}).create(),
-    'current_event': RecType({'e': Ty}).create()
-})
+kb = KnowledgeBase()
+for f in update_functions:
+    kb.add(f)
+kb.add(RecType({'agenda': SingletonType(ListType(Ty), [])}).create(), 'current_state')
 
 
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
-        if len(frame.current_state.agenda) > 0:
+        if not kb.has_symbol('current_event') and len(self.kb.current_state.agenda) > 0:
             return {}
 
-    def effect(self):
-        return CreationAct('current_event', RecType({'e': frame.current_state.agenda[0].pathvalue('e')}))
+    def effects(self):
+        return [CreationAct('current_event', RecType({'e': self.kb.current_state.agenda[0].pathvalue('e')}))]
 
 
 class EventBasedUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55a
     def preconditions(self):
-        for f in update_functions:
-            if isinstance(f.body, Fun) and f.validate_arg(frame.current_state) \
-                    and f.body.validate_arg(frame.current_event):
-                return {'f': f}
+        if self.kb.has_symbol('current_event'):
+            for obj in kb:
+                if isinstance(obj, Fun) and isinstance(obj.body, Fun) and obj.validate_arg(self.kb.current_state) \
+                        and obj.body.validate_arg(self.kb.current_event):
+                    return {'f': obj}
 
-    def effect(self, f):
-        return SpecificTypeJudgementAct('next_state', f.app(self.frame.current_state).app(self.frame.current_event))
+    def effects(self, f):
+        return [
+            CreationAct('current_state', f.app(self.kb.current_state).app(self.kb.current_event)),
+            ConsumeAct('current_event')
+        ]
 
 
 class TacitUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
-        for f in update_functions:
-            if isinstance(f.body, RecType) and f.validate_arg(self.frame.current_state):
-                return {'f': f}
+        for obj in kb:
+            if isinstance(obj, Fun) and isinstance(obj.body, RecType) and obj.validate_arg(self.kb.current_state):
+                return {'f': obj}
 
-    def effect(self, f):
-        return SpecificTypeJudgementAct('next_state', f.app(self.frame.current_state))
+    def effects(self, f):
+        return [CreationAct('current_state', f.app(self.kb.current_state))]
 
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
 
 
-def update_frame():
+def update_kb():
     # Assumptions:
     # - Action rules are tried in arbitrary order.
     # - There is either no current event or exactly one current event.
@@ -129,32 +133,33 @@ def update_frame():
     #   a current event already exists.
 
     for action_rule in action_rules:
-        bindings = action_rule(frame).preconditions()
+        bindings = action_rule(kb).preconditions()
         if bindings is not None:
             print('preconditions hold for ' + action_rule.__name__ + ' with bindings ' + str(
                 {key: show(value) for key, value in bindings.items()}))
-            effect = action_rule(frame).effect(**bindings)
-            if isinstance(effect, SpecificTypeJudgementAct) and effect.symbol == 'next_state':
-                next_state = effect.judged_type.create()
-                return Rec({
-                    'current_state': next_state,
-                    'current_event': RecType({'e': Ty}).create()
-                })
-            elif isinstance(effect, CreationAct) and effect.symbol == 'current_event':
-                if RecType({'e': Ty}).query(frame.current_event):
-                    print('creating current event of type ' + show(effect.type_to_create))
-                    current_event = effect.type_to_create.create()
-                    return Rec({
-                        'current_state': frame.current_state,
-                        'current_event': current_event
-                    })
-            else:
-                raise Exception("Don't know how to handle rule effect " + str(effect))
-    raise Exception('Failed to get next state with current_state=' + show(frame.current_state) +
-                    ', current_event=' + show(frame.current_event))
+            effects = action_rule(kb).effects(**bindings)
+            for effect in effects:
+                if isinstance(effect, CreationAct):
+                    obj = effect.type_to_create.create()
+                    if kb.has_symbol(effect.symbol):
+                        kb.remove(effect.symbol)
+                    kb.add(obj, effect.symbol)
+                elif isinstance(effect, ConsumeAct):
+                    kb.remove(effect.symbol)
+                else:
+                    raise Exception("Don't know how to handle rule effect " + str(effect))
+            return
+    raise Exception('Failed to get next state with current_state=' + show(kb.current_state) +
+                    ', current_event=' + show(kb.get('current_event', None)))
 
 
-print('state', show(frame.current_state))
+def show_kb():
+    print('-' * 50)
+    for symbol, obj in kb.named_objects.items():
+        print(symbol + '=' + show(obj))
+
+
+show_kb()
 for _ in range(20):
-    frame = update_frame()
-    print('state', show(frame.current_state))
+    update_kb()
+    show_kb()
