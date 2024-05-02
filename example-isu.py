@@ -4,20 +4,8 @@ from actionrules import ActionRule, SpecificTypeJudgementAct, CreationAct
 from utils import show
 
 
-Ind = BType('Ind')
-run = Pred('run', [Ind])
-T1 = RecType({'agenda': SingletonType(ListType(Ty), [RecType({'e': PType(run, ['j'])})]),
-              'latest_move': SingletonType(ListType(Re), [])})
-T2 = RecType({'agenda': SingletonType(ListType(Ty), []),
-              'latest_move': RecType({'e': PType(run, ['j'])})})
-print(
-    show(
-        T1.amerge(T2)
-        )
-        )
-
-
 # Game of fetch, corresponding to Cooper (2023, p.55)
+Ind = BType('Ind')
 pick_up = Pred('pick_up', [Ind, Ind])
 attract_attention = Pred('attract_attention', [Ind, Ind])
 throw = Pred('throw', [Ind, Ind])
