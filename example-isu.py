@@ -91,16 +91,6 @@ update_functions = {
             RecType({'agenda': SingletonType(ListType(Ty), [])}))),
 }
 
-kb = KnowledgeBase()
-for f in update_functions:
-    kb.add(f)
-
-s0_type = RecType({
-    'agenda': SingletonType(ListType(Ty), []),
-    'current_events': SingletonType(ListType(Ty), []),
-})
-kb.add(s0_type.create(), 's_0')
-
 
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
@@ -170,13 +160,15 @@ def perceive(ty):
             add_to_current_events(ty)
 
 
-def show_kb():
-    print('-' * 50)
-    for symbol, obj in kb.named_objects.items():
-        print(symbol + '=' + show(obj))
+def print_agent_internals():
+    print('state: ' + show(agent.current_state))
+    print('current_event: ' + show(agent.current_event))
+    print()
 
 
-show_kb()
+initial_state = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
+agent = Agent(update_functions, action_rules, initial_state)
+print_agent_internals()
 for _ in range(20):
-    update_kb()
-    show_kb()
+    agent.update_state()
+    print_agent_internals()

@@ -1,11 +1,11 @@
 class ActionRule:
-    def __init__(self, kb):
-        self.kb = kb
+    def __init__(self, agent):
+        self.agent = agent
 
     def preconditions(self):
         raise NotImplementedError()
 
-    def effects(self, **kwargs):
+    def apply_effects(self, **kwargs):
         raise NotImplementedError()
 
 
