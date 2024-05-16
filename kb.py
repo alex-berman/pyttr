@@ -31,3 +31,6 @@ class KnowledgeBase(object):
         obj = self.named_objects[symbol]
         self.objects.remove(obj)
         del self.named_objects[symbol]
+
+    def get_symbols(self):
+        return self.named_objects.keys()

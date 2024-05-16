@@ -16,14 +16,8 @@ class SpecificTypeJudgementAct:
 
 
 class CreationAct:
-    def __init__(self, symbol, type_to_create):
-        self.symbol = symbol
+    def __init__(self, type_to_create):
         self.type_to_create = type_to_create
 
     def __repr__(self):
-        return "CreationAct(" + repr(self.symbol) + ", "  + repr(self.type_to_create) + ")"
-
-
-class ConsumeAct:
-    def __init__(self, symbol):
-        self.symbol = symbol
+        return "CreationAct(" + repr(self.type_to_create) + ")"
