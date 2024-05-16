@@ -1,6 +1,5 @@
 from ttrtypes import BType, PType, Pred, ListType, SingletonType, RecType, Ty, Re, Fun
-from actionrules import ActionRule, CreationAct, SpecificTypeJudgementAct
-from kb import KnowledgeBase
+from actionrules import ActionRule
 from utils import show
 
 
@@ -14,34 +13,21 @@ return_pred = Pred('return', [Ind, Ind, Ind])
 
 update_functions = {
     Fun('r',
-        RecType({
-            'agenda': SingletonType(ListType(Ty), []),
-            'current_events': SingletonType(ListType(Ty), [])
-        }),
-        RecType({
-            'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, ['a', 'c'])})
-            ]),
-            'current_events': SingletonType(ListType(Ty), [])
-        })),
+        RecType({'agenda': SingletonType(ListType(Ty), [])}),
+        RecType({'agenda': SingletonType(ListType(Ty), [
+            RecType({'e': PType(pick_up, ['a', 'c'])})
+        ])})),
 
     Fun('r',
-        RecType({
-            'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, ['a', 'c'])})
-            ]),
-            'current_events': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, ['a', 'c'])})
-            ])
-        }),
-        RecType({
-            'agenda': SingletonType(ListType(Ty), [
+        RecType({'agenda': SingletonType(ListType(Ty), [
+            RecType({'e': PType(pick_up, ['a', 'c'])})
+        ])}),
+        Fun('e',
+            RecType({'e': PType(pick_up, ['a', 'c'])}),
+            RecType({'agenda': SingletonType(ListType(Ty), [
                 RecType({'e': PType(attract_attention, ['a', 'b'])})
-            ]),
-            'current_events': SingletonType(ListType(Ty), [])
-        })),
+            ])}))),
 
-    # TODO: change below as above
     Fun('r',
         RecType({'agenda': SingletonType(ListType(Ty), [
             RecType({'e': PType(attract_attention, ['a', 'b'])})
@@ -91,92 +77,72 @@ update_functions = {
             RecType({'agenda': SingletonType(ListType(Ty), [])}))),
 }
 
-kb = KnowledgeBase()
-for f in update_functions:
-    kb.add(f)
-
-s0_type = RecType({
-    'agenda': SingletonType(ListType(Ty), []),
-    'current_events': SingletonType(ListType(Ty), []),
-})
-kb.add(s0_type.create(), 's_0')
-
 
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
-        s_symbols = [symbol for symbol in self.kb.get_symbols() if symbol[0:2] == 's_']
-        if len(s_symbols) > 0:
-            current_t = max([int(symbol[2:]) for symbol in s_symbols])
-            current_state_symbol = 's_' + str(current_t)
-            current_state = self.kb.get(current_state_symbol)
-            if len(current_state.agenda) > 0:
-                return {'current_state': current_state}
+        if self.agent.current_event is None and len(self.agent.current_state.agenda) > 0:
+            return {}
 
-    def effects(self, current_state):
-        return [CreationAct(RecType({'e': current_state.agenda[0].pathvalue('e')}))]
+    def apply_effects(self):
+        self.agent.current_event = RecType({'e': self.agent.current_state.agenda[0].pathvalue('e')}).create()
+
+
+class EventBasedUpdate(ActionRule):
+    # Corresponds to Cooper (2023, p. 61), 55a
+    def preconditions(self):
+        if self.agent.current_event is not None:
+            for f in self.agent.update_functions:
+                if isinstance(f.body, Fun) and f.validate_arg(self.agent.current_state) \
+                        and f.body.validate_arg(self.agent.current_event):
+                    return {'f': f}
+
+    def apply_effects(self, f):
+        self.agent.current_state = f.app(self.agent.current_state).app(self.agent.current_event).create()
+        self.agent.current_event = None
 
 
 class TacitUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
-        s_symbols = [symbol for symbol in self.kb.get_symbols() if symbol[0:2] == 's_']
-        if len(s_symbols) > 0:
-            current_t = max([int(symbol[2:]) for symbol in s_symbols])
-            current_state_symbol = 's_' + str(current_t)
-            current_state = self.kb.get(current_state_symbol)
-            for obj in kb:
-                if isinstance(obj, Fun) and isinstance(obj.body, RecType) and obj.validate_arg(current_state):
-                    return {
-                        'f': obj,
-                        'current_state': current_state,
-                        'current_t': current_t}
+        for f in self.agent.update_functions:
+            if isinstance(f.body, RecType) and f.validate_arg(self.agent.current_state):
+                return {'f': f}
 
-    def effects(self, f, current_state, current_t):
-        next_t = current_t + 1
-        return [SpecificTypeJudgementAct('s_' + str(next_t), f.app(current_state))]
+    def apply_effects(self, f):
+        self.agent.current_state = f.app(self.agent.current_state).create()
 
 
-action_rules = {EventCreation, TacitUpdate}
+action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
 
 
-def update_kb():
-    # Assumptions:
-    # - Action rules are tried in arbitrary order.
-    # - There is either no current event or exactly one current event.
-    # - If the preconditions for an action rule hold, the rule is applied, unless the rule creates a current event and
-    #   a current event already exists.
+class Agent:
+    def __init__(self, update_functions, action_rules, initial_state):
+        self.update_functions = update_functions
+        self.action_rules = action_rules
+        self.current_state = initial_state
+        self.current_event = None
 
-    for action_rule in action_rules:
-        bindings = action_rule(kb).preconditions()
-        if bindings is not None:
-            print('preconditions hold for ' + action_rule.__name__ + ' with bindings ' + str(
-                {key: show(value) for key, value in bindings.items()}))
-            effects = action_rule(kb).effects(**bindings)
-            for effect in effects:
-                if isinstance(effect, CreationAct):
-                    perceive(effect.type_to_create)
-                else:
-                    raise Exception("Don't know how to handle rule effect " + str(effect))
-            return
-    raise Exception('Failed to get next state')
+    def update_state(self):
+        for action_rule in self.action_rules:
+            bindings = action_rule(self).preconditions()
+            if bindings is not None:
+                print('preconditions hold for ' + action_rule.__name__ + ' with bindings ' + str(
+                    {key: show(value) for key, value in bindings.items()}))
+                action_rule(self).apply_effects(**bindings)
+                return
+        raise Exception('Failed to get next state')
 
 
-def perceive(ty):
-    # Perceive something as being of type ty
-    if isinstance(ty, RecType):
-        e = ty.pathvalue('e')
-        if e:
-            add_to_current_events(ty)
+def print_agent_internals():
+    print('state: ' + show(agent.current_state))
+    print('current_event: ' + show(agent.current_event))
+    print()
 
 
-def show_kb():
-    print('-' * 50)
-    for symbol, obj in kb.named_objects.items():
-        print(symbol + '=' + show(obj))
-
-
-show_kb()
+initial_state = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
+agent = Agent(update_functions, action_rules, initial_state)
+print_agent_internals()
 for _ in range(20):
-    update_kb()
-    show_kb()
+    agent.update_state()
+    print_agent_internals()
