@@ -88,7 +88,7 @@ class EventCreation(ActionRule):
             return {}
 
     def apply_effects(self):
-        create_event_in_world(RecType({'e': self.agent.states[-1].agenda[0].pathvalue('e')}))
+        create_event_in_world(self.agent.states[-1].agenda[0])
 
 
 class EventBasedUpdate(ActionRule):
