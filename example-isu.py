@@ -81,11 +81,11 @@ update_functions = {
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
-        if self.agent.current_event is None and len(self.agent.current_state.agenda) > 0:
+        if self.agent.current_event is None and len(self.agent.states[-1].agenda) > 0:
             return {}
 
     def apply_effects(self):
-        create_event_in_world(RecType({'e': self.agent.current_state.agenda[0].pathvalue('e')}))
+        create_event_in_world(RecType({'e': self.agent.states[-1].agenda[0].pathvalue('e')}))
 
 
 class EventBasedUpdate(ActionRule):
@@ -93,12 +93,12 @@ class EventBasedUpdate(ActionRule):
     def preconditions(self):
         if self.agent.current_event is not None:
             for f in self.agent.update_functions:
-                if isinstance(f.body, Fun) and f.validate_arg(self.agent.current_state) \
+                if isinstance(f.body, Fun) and f.validate_arg(self.agent.states[-1]) \
                         and f.body.validate_arg(self.agent.current_event):
                     return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.current_state = f.app(self.agent.current_state).app(self.agent.current_event).create()
+        self.agent.states.append(f.app(self.agent.states[-1]).app(self.agent.current_event).create())
         self.agent.current_event = None
 
 
@@ -106,11 +106,11 @@ class TacitUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
         for f in self.agent.update_functions:
-            if isinstance(f.body, RecType) and f.validate_arg(self.agent.current_state):
+            if isinstance(f.body, RecType) and f.validate_arg(self.agent.states[-1]):
                 return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.current_state = f.app(self.agent.current_state).create()
+        self.agent.states.append(f.app(self.agent.states[-1]).create())
 
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
@@ -120,7 +120,7 @@ class Agent:
     def __init__(self, update_functions, action_rules, initial_state):
         self.update_functions = update_functions
         self.action_rules = action_rules
-        self.current_state = initial_state
+        self.states = [initial_state]
         self.current_event = None
 
     def update_state(self):
@@ -140,8 +140,8 @@ def create_event_in_world(ty):
 
 
 def print_agent_internals():
-    print('state: ' + show(agent.current_state))
-    print('current_event: ' + show(agent.current_event))
+    print('current state: ' + show(agent.states[-1]))
+    print('current event: ' + show(agent.current_event))
     print()
 
 
