@@ -1,9 +1,10 @@
 from ttrtypes import BType, PType, Pred, ListType, SingletonType, RecType, Ty, Re, Fun
+from records import Rec
 from actionrules import ActionRule
 from utils import show
 
 
-# Game of fetch, corresponding to Cooper (2023, p.55)
+# Game of fetch, corresponding to Cooper (2023, p.60)
 Ind = BType('Ind')
 pick_up = Pred('pick_up', [Ind, Ind])
 attract_attention = Pred('attract_attention', [Ind, Ind])
@@ -11,71 +12,73 @@ throw = Pred('throw', [Ind, Ind])
 run_after = Pred('run_after', [Ind, Ind])
 return_pred = Pred('return', [Ind, Ind, Ind])
 
-update_functions = {
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [])}),
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(pick_up, ['a', 'c'])})
-        ])})),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(pick_up, ['a', 'c'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(pick_up, ['a', 'c'])}),
+def update_functions(r):
+    return {
+        Fun('r',
+            RecType({'agenda': SingletonType(ListType(Ty), [])}),
             RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(attract_attention, ['a', 'b'])})
-            ])}))),
+                RecType({'e': PType(pick_up, [r.h, r.s])})
+            ])})),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(attract_attention, ['a', 'b'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(attract_attention, ['a', 'b'])}),
+        Fun('r',
             RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(throw, ['a', 'c'])})
-            ])}))),
+                RecType({'e': PType(pick_up, [r.h, r.s])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(pick_up, [r.h, r.s])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [
+                    RecType({'e': PType(attract_attention, [r.h, r.d])})
+                ])}))),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(throw, ['a', 'c'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(throw, ['a', 'c'])}),
+        Fun('r',
             RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(run_after, ['b', 'c'])})
-            ])}))),
+                RecType({'e': PType(attract_attention, [r.h, r.d])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(attract_attention, [r.h, r.d])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [
+                    RecType({'e': PType(throw, [r.h, r.s])})
+                ])}))),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(run_after, ['b', 'c'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(run_after, ['b', 'c'])}),
+        Fun('r',
             RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, ['b', 'c'])})
-            ])}))),
+                RecType({'e': PType(throw, [r.h, r.s])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(throw, [r.h, r.s])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [
+                    RecType({'e': PType(run_after, [r.d, r.s])})
+                ])}))),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(pick_up, ['b', 'c'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(pick_up, ['b', 'c'])}),
+        Fun('r',
             RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(return_pred, ['b', 'c', 'a'])})
-            ])}))),
+                RecType({'e': PType(run_after, [r.d, r.s])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(run_after, [r.d, r.s])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [
+                    RecType({'e': PType(pick_up, [r.d, r.s])})
+                ])}))),
 
-    Fun('r',
-        RecType({'agenda': SingletonType(ListType(Ty), [
-            RecType({'e': PType(return_pred, ['b', 'c', 'a'])})
-        ])}),
-        Fun('e',
-            RecType({'e': PType(return_pred, ['b', 'c', 'a'])}),
-            RecType({'agenda': SingletonType(ListType(Ty), [])}))),
-}
+        Fun('r',
+            RecType({'agenda': SingletonType(ListType(Ty), [
+                RecType({'e': PType(pick_up, [r.d, r.s])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(pick_up, [r.d, r.s])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [
+                    RecType({'e': PType(return_pred, [r.d, r.s, r.h])})
+                ])}))),
+
+        Fun('r',
+            RecType({'agenda': SingletonType(ListType(Ty), [
+                RecType({'e': PType(return_pred, [r.d, r.s, r.h])})
+            ])}),
+            Fun('e',
+                RecType({'e': PType(return_pred, [r.d, r.s, r.h])}),
+                RecType({'agenda': SingletonType(ListType(Ty), [])}))),
+    }
 
 
 class EventCreation(ActionRule):
@@ -145,8 +148,15 @@ def print_agent_internals():
     print()
 
 
+r = Rec({
+    # A record containing individuals in the roles of human, dog and stick
+    'h': 'h1',
+    'd': 'd1',
+    's': 's1'
+})
+
 initial_state = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
-agent = Agent(update_functions, action_rules, initial_state)
+agent = Agent(update_functions(r), action_rules, initial_state)
 print_agent_internals()
 for _ in range(20):
     agent.update_state()
