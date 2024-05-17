@@ -85,7 +85,7 @@ class EventCreation(ActionRule):
             return {}
 
     def apply_effects(self):
-        self.agent.current_event = RecType({'e': self.agent.current_state.agenda[0].pathvalue('e')}).create()
+        create_event_in_world(RecType({'e': self.agent.current_state.agenda[0].pathvalue('e')}))
 
 
 class EventBasedUpdate(ActionRule):
@@ -132,6 +132,11 @@ class Agent:
                 action_rule(self).apply_effects(**bindings)
                 return
         raise Exception('Failed to get next state')
+
+
+def create_event_in_world(ty):
+    # We here assume that when a event is created in the world, the agent immediately perceives it
+    agent.current_event = ty.create()
 
 
 def print_agent_internals():
