@@ -148,7 +148,7 @@ agents = [Agent(update_functions(r), action_rules, initial_state) for _ in range
 
 
 def create_event_in_world(ty):
-    # We here assume that when a event is created in the world, all agents immediately perceive it.
+    # We assume that when a event is created in the world, all agents immediately perceive it.
     event = ty.create()
     for agent in agents:
         agent.current_event = event
