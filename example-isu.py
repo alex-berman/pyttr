@@ -130,22 +130,11 @@ class Agent:
         for action_rule in self.action_rules:
             bindings = action_rule(self).preconditions()
             if bindings is not None:
-                print('preconditions hold for ' + action_rule.__name__ + ' with bindings ' + str(
-                    {key: show(value) for key, value in bindings.items()}))
+                # print('preconditions hold for ' + action_rule.__name__ + ' with bindings ' + str(
+                #     {key: show(value) for key, value in bindings.items()}))
                 action_rule(self).apply_effects(**bindings)
                 return
         raise Exception('Failed to get next state')
-
-
-def create_event_in_world(ty):
-    # We here assume that when a event is created in the world, the agent immediately perceives it
-    agent.current_event = ty.create()
-
-
-def print_agent_internals():
-    print('current state: ' + show(agent.states[-1]))
-    print('current event: ' + show(agent.current_event))
-    print()
 
 
 r = Rec({
@@ -154,10 +143,32 @@ r = Rec({
     'd': 'd1',
     's': 's1'
 })
-
 initial_state = RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
-agent = Agent(update_functions(r), action_rules, initial_state)
-print_agent_internals()
-for _ in range(20):
-    agent.update_state()
+agents = [Agent(update_functions(r), action_rules, initial_state) for _ in range(2)]
+
+
+def create_event_in_world(ty):
+    # We here assume that when a event is created in the world, all agents immediately perceive it.
+    event = ty.create()
+    for agent in agents:
+        agent.current_event = event
+
+
+def print_agent_internals():
+    for n, agent in enumerate(agents):
+        print('agent ' + str(n) + ':')
+        print('  current state: ' + show(agent.states[-1]))
+        print('  current event: ' + show(agent.current_event))
+        print()
+    print('-' * 70)
+
+
+def main():
     print_agent_internals()
+    for _ in range(20):
+        for agent in agents:
+            agent.update_state()
+        print_agent_internals()
+
+
+main()
