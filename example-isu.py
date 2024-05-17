@@ -84,7 +84,7 @@ def update_functions(r):
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
-        if self.agent.current_event is None and len(self.agent.states[-1].agenda) > 0:
+        if len(self.agent.states[-1].agenda) > 0:
             return {}
 
     def apply_effects(self):
@@ -148,7 +148,7 @@ agents = [Agent(update_functions(r), action_rules, initial_state) for _ in range
 
 
 def create_event_in_world(ty):
-    # We here assume that when a event is created in the world, all agents immediately perceive it.
+    # We assume that when a event is created in the world, all agents immediately perceive it.
     event = ty.create()
     for agent in agents:
         agent.current_event = event
