@@ -15,6 +15,7 @@ return_pred = Pred('return', [Ind, Ind, Ind])
 
 
 def update_functions(r):
+    # r is a record containing role assignments for h (human), d (dog), and s (stick)
     return {
         Fun('r',
             RecType({'agenda': SingletonType(ListType(Ty), [])}),
@@ -168,8 +169,7 @@ class InformationStateHistory(list):
             return '[..., ' + show(self[-1]) + ']'
 
 
-r = Rec({
-    # A record containing individuals in the roles of human, dog and stick
+roles = Rec({
     'h': 'h1',
     'd': 'd1',
     's': 's1'
@@ -182,7 +182,7 @@ def initial_state():
     ])
 
 
-agents = [Agent(update_functions(r), action_rules, initial_state()) for _ in range(2)]
+agents = [Agent(update_functions(roles), action_rules, initial_state()) for _ in range(2)]
 
 
 def handle_action(action):
