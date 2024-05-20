@@ -83,14 +83,22 @@ def update_functions(r):
     }
 
 
+def uninstantiated_witness(ty):
+    s = 'uninstantiated_witness'
+    ty.judge(s)
+    return s
+
+
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
-        if self.agent.current_perceived_object is None and len(self.agent.state[-1].agenda) > 0:
-            return {}
+        if self.agent.current_perceived_object is None:
+            agenda = self.agent.state[-1].comps.agenda.comps.obj
+            if len(agenda) > 0:
+                return {'agenda': agenda}
 
-    def apply_effects(self):
-        self.agent.pending_actions.insert(0, CreateAct(self.agent.state[-1].agenda[0]))
+    def apply_effects(self, agenda):
+        self.agent.pending_actions.insert(0, CreateAct(agenda[0]))
 
 
 class EventBasedUpdate(ActionRule):
@@ -98,23 +106,25 @@ class EventBasedUpdate(ActionRule):
     def preconditions(self):
         if self.agent.current_perceived_object is not None:
             for f in self.agent.update_functions:
-                if isinstance(f.body, Fun) and f.validate_arg(self.agent.state[-1]) \
+                if isinstance(f.body, Fun) and f.validate_arg(uninstantiated_witness(self.agent.state[-1])) \
                         and f.body.validate_arg(self.agent.current_perceived_object):
                     return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.state.append(f.app(self.agent.state[-1]).app(self.agent.current_perceived_object).create())
+        self.agent.state.append(
+            f.app(uninstantiated_witness(self.agent.state[-1])).app(
+                self.agent.current_perceived_object))
 
 
 class TacitUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
         for f in self.agent.update_functions:
-            if isinstance(f.body, RecType) and f.validate_arg(self.agent.state[-1]):
+            if isinstance(f.body, RecType) and f.validate_arg(uninstantiated_witness(self.agent.state[-1])):
                 return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.state.append(f.app(self.agent.state[-1]).create())
+        self.agent.state.append(f.app(uninstantiated_witness(self.agent.state[-1])))
 
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
@@ -178,7 +188,7 @@ roles = Rec({
 
 def initial_state():
     return InformationStateHistory([
-        RecType({'agenda': SingletonType(ListType(Ty), [])}).create()
+        RecType({'agenda': SingletonType(ListType(Ty), [])})
     ])
 
 
