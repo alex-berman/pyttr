@@ -83,12 +83,6 @@ def update_functions(r):
     }
 
 
-def uninstantiated_witness(ty):
-    s = 'uninstantiated_witness'
-    ty.judge(s)
-    return s
-
-
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54
     def preconditions(self):
@@ -102,29 +96,31 @@ class EventCreation(ActionRule):
 
 
 class EventBasedUpdate(ActionRule):
-    # Corresponds to Cooper (2023, p. 61), 55a
+    # Corresponds to Cooper (2023, p. 61), 55a, but with subtype query (s⊑domain_type(T)) instead of type query (s:T)
     def preconditions(self):
         if self.agent.current_perceived_object is not None:
             for f in self.agent.update_functions:
-                if isinstance(f.body, Fun) and f.validate_arg(uninstantiated_witness(self.agent.state[-1])) \
+                if isinstance(f.body, Fun) and self.agent.state[-1].subtype_of(f.domain_type) \
                         and f.body.validate_arg(self.agent.current_perceived_object):
                     return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.state.append(
-            f.app(uninstantiated_witness(self.agent.state[-1])).app(
-                self.agent.current_perceived_object))
+        uninstantiated_state = 's'
+        self.agent.state[-1].judge(uninstantiated_state)
+        self.agent.state.append(f.app(uninstantiated_state).app(self.agent.current_perceived_object))
 
 
 class TacitUpdate(ActionRule):
-    # Corresponds to Cooper (2023, p. 61), 55b
+    # Corresponds to Cooper (2023, p. 61), 55b, but with subtype query (s⊑domain_type(T)) instead of type query (s:T)
     def preconditions(self):
         for f in self.agent.update_functions:
-            if isinstance(f.body, RecType) and f.validate_arg(uninstantiated_witness(self.agent.state[-1])):
+            if isinstance(f.body, RecType) and self.agent.state[-1].subtype_of(f.domain_type):
                 return {'f': f}
 
     def apply_effects(self, f):
-        self.agent.state.append(f.app(uninstantiated_witness(self.agent.state[-1])))
+        uninstantiated_state = 's'
+        self.agent.state[-1].judge(uninstantiated_state)
+        self.agent.state.append(f.app(uninstantiated_state))
 
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
