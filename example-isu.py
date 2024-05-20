@@ -12,82 +12,98 @@ attract_attention = Pred('attract_attention', [Ind, Ind])
 throw = Pred('throw', [Ind, Ind])
 run_after = Pred('run_after', [Ind, Ind])
 return_pred = Pred('return', [Ind, Ind, Ind])
+infostate_type_empty = RecType({'agenda': SingletonType(ListType(Ty), [])})
 
 
 def update_functions(r):
-    # r is a record containing role assignments for h (human), d (dog), and s (stick)
+    infostate_type_pick_up_human = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(pick_up, [r.h, r.s])})
+    ])})
+    infostate_type_attract_attention = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(attract_attention, [r.h, r.d])})
+    ])})
+    infostate_type_throw = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(throw, [r.h, r.s])})
+    ])})
+    infostate_type_run_after = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(run_after, [r.d, r.s])})
+    ])})
+    infostate_type_pick_up_dog = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(pick_up, [r.d, r.s])})
+    ])})
+    infostate_type_return = RecType({'agenda': SingletonType(ListType(Ty), [
+        RecType({'e': PType(return_pred, [r.d, r.s, r.h])})
+    ])})
+
     return {
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [])}),
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, [r.h, r.s])})
-            ])})),
+            infostate_type_empty,
+            infostate_type_pick_up_human),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, [r.h, r.s])})
-            ])}),
+            infostate_type_pick_up_human,
             Fun('e',
                 RecType({'e': PType(pick_up, [r.h, r.s])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [
-                    RecType({'e': PType(attract_attention, [r.h, r.d])})
-                ])}))),
+                infostate_type_attract_attention)),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(attract_attention, [r.h, r.d])})
-            ])}),
+            infostate_type_attract_attention,
             Fun('e',
                 RecType({'e': PType(attract_attention, [r.h, r.d])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [
-                    RecType({'e': PType(throw, [r.h, r.s])})
-                ])}))),
+                infostate_type_throw)),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(throw, [r.h, r.s])})
-            ])}),
+            infostate_type_throw,
             Fun('e',
                 RecType({'e': PType(throw, [r.h, r.s])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [
-                    RecType({'e': PType(run_after, [r.d, r.s])})
-                ])}))),
+                infostate_type_run_after)),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(run_after, [r.d, r.s])})
-            ])}),
+            infostate_type_run_after,
             Fun('e',
                 RecType({'e': PType(run_after, [r.d, r.s])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [
-                    RecType({'e': PType(pick_up, [r.d, r.s])})
-                ])}))),
+                infostate_type_pick_up_dog)),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(pick_up, [r.d, r.s])})
-            ])}),
+            infostate_type_pick_up_dog,
             Fun('e',
                 RecType({'e': PType(pick_up, [r.d, r.s])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [
-                    RecType({'e': PType(return_pred, [r.d, r.s, r.h])})
-                ])}))),
+                infostate_type_return)),
 
         Fun('r',
-            RecType({'agenda': SingletonType(ListType(Ty), [
-                RecType({'e': PType(return_pred, [r.d, r.s, r.h])})
-            ])}),
+            infostate_type_return,
             Fun('e',
                 RecType({'e': PType(return_pred, [r.d, r.s, r.h])}),
-                RecType({'agenda': SingletonType(ListType(Ty), [])}))),
+                infostate_type_empty)),
     }
 
 
+class InformationStateTimeStep(object):
+    def __init__(self, ty, i):
+        # An information-state timestep contains a type (of information state) and an uninstantiated witness of that
+        # type. The witness is represented by a timestep-specific string serving as a logical variable.
+        self.ty = ty
+        self.uninstantiated_witness = 'uninstantiated_witness_' + str(i)
+        ty.judge(self.uninstantiated_witness)
+
+
+class InformationStateHistory(list):
+    def __str__(self):
+        # Only show the latest state (if any)
+        if len(self) == 0:
+            return []
+        elif len(self) == 1:
+            return '[T=' + show(self[0].ty) + ']'
+        else:
+            return '[..., T=' + show(self[-1].ty) + ']'
+
+
 class EventCreation(ActionRule):
-    # Corresponds to Cooper (2023, p. 61), 54
+    # Corresponds to Cooper (2023, p. 61), 54, but with the difference that the creation act uses the information state
+    # type rather than the state as such. (s_{i,A} : T   T=[agenda:...] ~ : T.agenda.fst!)
     def preconditions(self):
         if self.agent.current_perceived_object is None:
-            agenda = self.agent.state[-1].comps.agenda.comps.obj
+            agenda = self.agent.state[-1].ty.pathvalue('agenda').comps.obj
             if len(agenda) > 0:
                 return {'agenda': agenda}
 
@@ -96,31 +112,33 @@ class EventCreation(ActionRule):
 
 
 class EventBasedUpdate(ActionRule):
-    # Corresponds to Cooper (2023, p. 61), 55a, but with subtype query (s⊑domain_type(T)) instead of type query (s:T)
+    # Corresponds to Cooper (2023, p. 61), 55a
     def preconditions(self):
         if self.agent.current_perceived_object is not None:
             for f in self.agent.update_functions:
-                if isinstance(f.body, Fun) and self.agent.state[-1].subtype_of(f.domain_type) \
+                if isinstance(f.body, Fun) and f.validate_arg(self.agent.state[-1].uninstantiated_witness) \
                         and f.body.validate_arg(self.agent.current_perceived_object):
                     return {'f': f}
 
     def apply_effects(self, f):
-        uninstantiated_state = 's'
-        self.agent.state[-1].judge(uninstantiated_state)
-        self.agent.state.append(f.app(uninstantiated_state).app(self.agent.current_perceived_object))
+        self.agent.state.append(
+            InformationStateTimeStep(
+                f.app(self.agent.state[-1].uninstantiated_witness).app(self.agent.current_perceived_object),
+                len(self.agent.state)))
 
 
 class TacitUpdate(ActionRule):
-    # Corresponds to Cooper (2023, p. 61), 55b, but with subtype query (s⊑domain_type(T)) instead of type query (s:T)
+    # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
         for f in self.agent.update_functions:
-            if isinstance(f.body, RecType) and self.agent.state[-1].subtype_of(f.domain_type):
+            if isinstance(f.body, RecType) and f.validate_arg(self.agent.state[-1].uninstantiated_witness):
                 return {'f': f}
 
     def apply_effects(self, f):
-        uninstantiated_state = 's'
-        self.agent.state[-1].judge(uninstantiated_state)
-        self.agent.state.append(f.app(uninstantiated_state))
+        self.agent.state.append(
+            InformationStateTimeStep(
+                f.app(self.agent.state[-1].uninstantiated_witness),
+                len(self.agent.state)))
 
 
 action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
@@ -164,17 +182,6 @@ class Agent:
         return result
 
 
-class InformationStateHistory(list):
-    def __str__(self):
-        # Only show the latest state (if any)
-        if len(self) == 0:
-            return []
-        elif len(self) == 1:
-            return '[' + show(self[0]) + ']'
-        else:
-            return '[..., ' + show(self[-1]) + ']'
-
-
 roles = Rec({
     'h': 'h1',
     'd': 'd1',
@@ -182,13 +189,11 @@ roles = Rec({
 })
 
 
-def initial_state():
-    return InformationStateHistory([
-        RecType({'agenda': SingletonType(ListType(Ty), [])})
-    ])
+def initial_agent_state():
+    return InformationStateHistory([InformationStateTimeStep(infostate_type_empty, 0)])
 
 
-agents = [Agent(update_functions(roles), action_rules, initial_state()) for _ in range(2)]
+agents = [Agent(update_functions(roles), action_rules, initial_agent_state()) for _ in range(2)]
 
 
 def handle_action(action):
