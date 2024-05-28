@@ -108,7 +108,7 @@ class EventCreation(ActionRule):
                 return {'agenda': agenda}
 
     def apply_effects(self, agenda):
-        self.agent.pending_actions.insert(0, CreateAct(agenda[0]))
+        self.agent.perform_type_act(CreateAct(agenda[0]))
 
 
 class EventBasedUpdate(ActionRule):
@@ -158,12 +158,11 @@ class Agent:
     def update_state(self):
         for obj in self.pending_perceptions:
             self.pending_perceptions.pop()
-            self.current_perceived_object = obj
-            self.apply_rules()
-        self.current_perceived_object = None
-        self.apply_rules()
+            self.apply_rules(obj)
+        self.apply_rules(None)
 
-    def apply_rules(self):
+    def apply_rules(self, current_perceived_object):
+        self.current_perceived_object = current_perceived_object
         print('  current perceived object: ' + show(self.current_perceived_object))
         for action_rule in self.action_rules:
             bindings = action_rule(self).preconditions()
@@ -175,6 +174,9 @@ class Agent:
 
     def perceive(self, obj):
         self.pending_perceptions.append(obj)
+
+    def perform_type_act(self, type_act):
+        self.pending_actions.insert(0, type_act)
 
     def get_pending_actions(self):
         result = [ty for ty in self.pending_actions]
