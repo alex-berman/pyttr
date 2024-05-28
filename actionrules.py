@@ -5,5 +5,5 @@ class ActionRule:
     def preconditions(self):
         raise NotImplementedError()
 
-    def apply_effects(self, **kwargs):
+    def apply_effects(self, **bindings):
         raise NotImplementedError()
