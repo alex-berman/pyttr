@@ -213,6 +213,7 @@ def create_object_in_world(ty):
 
 def print_agent_internals(agent):
     print('  state: ' + str(agent.state))
+    print('  pending_perceptions: [' + ', '.join([show(obj) for obj in agent.pending_perceptions]) + ']')
     print('  pending_actions: [' + ', '.join([str(action) for action in agent.pending_actions]) + ']')
 
 
