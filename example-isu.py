@@ -200,12 +200,12 @@ agents = [Agent(update_functions(roles), action_rules, initial_agent_state()) fo
 
 def handle_action(action):
     if isinstance(action, CreateAct):
-        create_event_in_world(action.ty)
+        create_object_in_world(action.ty)
 
 
-def create_event_in_world(ty):
-    # We assume that any event can be created at any time, regardless of the state of the world. We also assume that
-    # when a event is created in the world, all agents immediately perceive it.
+def create_object_in_world(ty):
+    # We assume that any object (e.g. event) can be created at any time, regardless of the state of the world. We also
+    # assume that when an object is created in the world, all agents immediately perceive it.
     event = ty.create()
     for agent in agents:
         agent.perceive(event)
