@@ -83,8 +83,8 @@ class InformationStateTimeStep(object):
         # An information-state timestep contains a type (of information state) and an uninstantiated witness of that
         # type. The witness is represented by a timestep-specific string serving as a logical variable.
         self.ty = ty
-        self.uninstantiated_witness = 'uninstantiated_witness_' + str(i)
-        ty.judge(self.uninstantiated_witness)
+        self.witness = 'witness_' + str(i)
+        ty.judge(self.witness)
 
 
 class InformationStateHistory(list):
@@ -116,14 +116,14 @@ class EventBasedUpdate(ActionRule):
     def preconditions(self):
         if self.agent.current_perceived_object is not None:
             for f in self.agent.update_functions:
-                if isinstance(f.body, Fun) and f.validate_arg(self.agent.state[-1].uninstantiated_witness) \
+                if isinstance(f.body, Fun) and f.validate_arg(self.agent.state[-1].witness) \
                         and f.body.validate_arg(self.agent.current_perceived_object):
                     return {'f': f}
 
     def apply_effects(self, f):
         self.agent.state.append(
             InformationStateTimeStep(
-                f.app(self.agent.state[-1].uninstantiated_witness).app(self.agent.current_perceived_object),
+                f.app(self.agent.state[-1].witness).app(self.agent.current_perceived_object),
                 len(self.agent.state)))
 
 
@@ -131,13 +131,13 @@ class TacitUpdate(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 55b
     def preconditions(self):
         for f in self.agent.update_functions:
-            if isinstance(f.body, RecType) and f.validate_arg(self.agent.state[-1].uninstantiated_witness):
+            if isinstance(f.body, RecType) and f.validate_arg(self.agent.state[-1].witness):
                 return {'f': f}
 
     def apply_effects(self, f):
         self.agent.state.append(
             InformationStateTimeStep(
-                f.app(self.agent.state[-1].uninstantiated_witness),
+                f.app(self.agent.state[-1].witness),
                 len(self.agent.state)))
 
 
