@@ -147,7 +147,8 @@ action_rules = {EventCreation, EventBasedUpdate, TacitUpdate}
 class Agent:
     # Generic class for an agent performing any activity characterized by update functions, action rules and an
     # initial state.
-    def __init__(self, update_functions, action_rules, initial_state):
+    def __init__(self, participant, update_functions, action_rules, initial_state):
+        self.participant = participant
         self.update_functions = update_functions
         self.action_rules = action_rules
         self.state = initial_state
@@ -157,7 +158,7 @@ class Agent:
 
     def update_state(self):
         for obj in self.pending_perceptions:
-            self.pending_perceptions.pop()
+            self.pending_perceptions.pop(0)
             self.apply_rules(obj)
         self.apply_rules(None)
 
@@ -195,20 +196,30 @@ def initial_agent_state():
     return InformationStateHistory([InformationStateTimeStep(infostate_type_empty, 0)])
 
 
-agents = [Agent(update_functions(roles), action_rules, initial_agent_state()) for _ in range(2)]
+def create_agent(participant):
+    return Agent(participant, update_functions(roles), action_rules, initial_agent_state())
 
 
-def handle_action(action):
+agents = {
+    create_agent(roles.h),
+    create_agent(roles.d)
+}
+
+
+def handle_action(participant, action):
     if isinstance(action, CreateAct):
-        create_object_in_world(action.ty)
+        event_agent = action.ty.pathvalue('e').comps.args[0]
+        if event_agent == participant:
+            create_object_in_world(action.ty)
 
 
 def create_object_in_world(ty):
     # We assume that any object (e.g. event) can be created at any time, regardless of the state of the world. We also
     # assume that when an object is created in the world, all agents immediately perceive it.
-    event = ty.create()
+    obj = ty.create()
+    print('  created object of type ' + show(ty) + ' as ' + show(event))
     for agent in agents:
-        agent.perceive(event)
+        agent.perceive(obj)
 
 
 def print_agent_internals(agent):
@@ -219,13 +230,12 @@ def print_agent_internals(agent):
 
 def main():
     for t in range(20):
-        for n, agent in enumerate(agents):
-            print('agent ' + str(n) + ':')
-            if t == 0:
-                print_agent_internals(agent)
+        for agent in agents:
+            print(agent.participant + ':')
+            print_agent_internals(agent)
             agent.update_state()
             for action in agent.get_pending_actions():
-                handle_action(action)
+                handle_action(agent.participant, action)
         print('-' * 70)
 
 
