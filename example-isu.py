@@ -208,16 +208,17 @@ agents = {
 
 def handle_action(participant, action):
     if isinstance(action, CreateAct):
+        # For a creation act to succeed (i.e. for an object to actually be created in the world), the agent's role in
+        # the game needs to match the agent in the event (first PType argument).
         event_agent = action.ty.pathvalue('e').comps.args[0]
         if event_agent == participant:
             create_object_in_world(action.ty)
 
 
 def create_object_in_world(ty):
-    # We assume that any object (e.g. event) can be created at any time, regardless of the state of the world. We also
-    # assume that when an object is created in the world, all agents immediately perceive it.
+    # We assume that when an object is created in the world, all agents immediately perceive it.
     obj = ty.create()
-    print('  created object of type ' + show(ty) + ' as ' + show(event))
+    print('  created object of type ' + show(ty) + ' as ' + show(obj))
     for agent in agents:
         agent.perceive(obj)
 
