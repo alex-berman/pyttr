@@ -1,0 +1,563 @@
+h1:
+  state: [T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+d1:
+  state: [T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(h1, s1)})]
+  created object of type {e : pick_up(h1, s1)} as {e = _e0}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e0}]
+  pending_actions: []
+  current perceived object: {e = _e0}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e0}]
+  pending_actions: []
+  current perceived object: {e = _e0}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+  created object of type {e : attract_attention(h1, d1)} as {e = _e1}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e1}]
+  pending_actions: []
+  current perceived object: {e = _e1}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e1}]
+  pending_actions: []
+  current perceived object: {e = _e1}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+  created object of type {e : throw(h1, s1)} as {e = _e2}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e2}]
+  pending_actions: []
+  current perceived object: {e = _e2}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+  created object of type {e : run_after(d1, s1)} as {e = _e3}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e2}, {e = _e3}]
+  pending_actions: []
+  current perceived object: {e = _e2}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e3}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e3}]
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e3}]
+  pending_actions: []
+  current perceived object: {e = _e3}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+  created object of type {e : pick_up(d1, s1)} as {e = _e4}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e3}, {e = _e4}]
+  pending_actions: []
+  current perceived object: {e = _e3}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e4}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e4}]
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e4}]
+  pending_actions: []
+  current perceived object: {e = _e4}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : return(d1, s1, h1)})]
+  created object of type {e : return(d1, s1, h1)} as {e = _e5}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e4}, {e = _e5}]
+  pending_actions: []
+  current perceived object: {e = _e4}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e5}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e5}]
+  pending_actions: [CreateAct({e : return(d1, s1, h1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e5}]
+  pending_actions: []
+  current perceived object: {e = _e5}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e5}]
+  pending_actions: []
+  current perceived object: {e = _e5}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(h1, s1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(h1, s1)})]
+  created object of type {e : pick_up(h1, s1)} as {e = _e6}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e6}]
+  pending_actions: []
+  current perceived object: {e = _e6}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e6}]
+  pending_actions: []
+  current perceived object: {e = _e6}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+  created object of type {e : attract_attention(h1, d1)} as {e = _e7}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e7}]
+  pending_actions: []
+  current perceived object: {e = _e7}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e7}]
+  pending_actions: []
+  current perceived object: {e = _e7}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+  created object of type {e : throw(h1, s1)} as {e = _e8}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e8}]
+  pending_actions: []
+  current perceived object: {e = _e8}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+  created object of type {e : run_after(d1, s1)} as {e = _e9}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e8}, {e = _e9}]
+  pending_actions: []
+  current perceived object: {e = _e8}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e9}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e9}]
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e9}]
+  pending_actions: []
+  current perceived object: {e = _e9}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+  created object of type {e : pick_up(d1, s1)} as {e = _e10}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e9}, {e = _e10}]
+  pending_actions: []
+  current perceived object: {e = _e9}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e10}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e10}]
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e10}]
+  pending_actions: []
+  current perceived object: {e = _e10}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : return(d1, s1, h1)})]
+  created object of type {e : return(d1, s1, h1)} as {e = _e11}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e10}, {e = _e11}]
+  pending_actions: []
+  current perceived object: {e = _e10}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e11}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e11}]
+  pending_actions: [CreateAct({e : return(d1, s1, h1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e11}]
+  pending_actions: []
+  current perceived object: {e = _e11}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: [{e = _e11}]
+  pending_actions: []
+  current perceived object: {e = _e11}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying TacitUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(h1, s1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(h1, s1)})]
+  created object of type {e : pick_up(h1, s1)} as {e = _e12}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e12}]
+  pending_actions: []
+  current perceived object: {e = _e12}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(h1, s1)}]}]
+  pending_perceptions: [{e = _e12}]
+  pending_actions: []
+  current perceived object: {e = _e12}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : attract_attention(h1, d1)})]
+  created object of type {e : attract_attention(h1, d1)} as {e = _e13}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e13}]
+  pending_actions: []
+  current perceived object: {e = _e13}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : attract_attention(h1, d1)}]}]
+  pending_perceptions: [{e = _e13}]
+  pending_actions: []
+  current perceived object: {e = _e13}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : throw(h1, s1)})]
+  created object of type {e : throw(h1, s1)} as {e = _e14}
+d1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e14}]
+  pending_actions: []
+  current perceived object: {e = _e14}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+  created object of type {e : run_after(d1, s1)} as {e = _e15}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : throw(h1, s1)}]}]
+  pending_perceptions: [{e = _e14}, {e = _e15}]
+  pending_actions: []
+  current perceived object: {e = _e14}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e15}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e15}]
+  pending_actions: [CreateAct({e : run_after(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e15}]
+  pending_actions: []
+  current perceived object: {e = _e15}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+  created object of type {e : pick_up(d1, s1)} as {e = _e16}
+----------------------------------------------------------------------
+h1:
+  state: [..., T={agenda : [Ty]_[{e : run_after(d1, s1)}]}]
+  pending_perceptions: [{e = _e15}, {e = _e16}]
+  pending_actions: []
+  current perceived object: {e = _e15}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e16}]
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e16}]
+  pending_actions: [CreateAct({e : pick_up(d1, s1)})]
+d1:
+  state: [..., T={agenda : [Ty]_[{e : pick_up(d1, s1)}]}]
+  pending_perceptions: [{e = _e16}]
+  pending_actions: []
+  current perceived object: {e = _e16}
+  applying EventBasedUpdate
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: []
+  current perceived object: None
+  applying EventCreation
+  state: [..., T={agenda : [Ty]_[{e : return(d1, s1, h1)}]}]
+  pending_perceptions: []
+  pending_actions: [CreateAct({e : return(d1, s1, h1)})]
+  created object of type {e : return(d1, s1, h1)} as {e = _e17}
+----------------------------------------------------------------------
