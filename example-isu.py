@@ -87,17 +87,6 @@ class InformationStateTimeStep(object):
         ty.judge(self.witness)
 
 
-class InformationStateHistory(list):
-    def __str__(self):
-        # Only show the latest state (if any)
-        if len(self) == 0:
-            return []
-        elif len(self) == 1:
-            return '[T=' + show(self[0].ty) + ']'
-        else:
-            return '[..., T=' + show(self[-1].ty) + ']'
-
-
 class EventCreation(ActionRule):
     # Corresponds to Cooper (2023, p. 61), 54, but with the difference that the creation act uses the information state
     # type rather than the state as such. (s_{i,A} : T   T=[agenda:...] ~ : T.agenda.fst!)
@@ -193,7 +182,7 @@ roles = Rec({
 
 
 def initial_agent_state():
-    return InformationStateHistory([InformationStateTimeStep(infostate_type_empty, 0)])
+    return [InformationStateTimeStep(infostate_type_empty, 0)]
 
 
 def create_agent(participant):
@@ -224,9 +213,19 @@ def create_object_in_world(ty):
 
 
 def print_agent_internals(agent):
-    print('  state: ' + str(agent.state))
+    print('  state: ' + format_state(agent.state))
     print('  pending_perceptions: [' + ', '.join([show(obj) for obj in agent.pending_perceptions]) + ']')
     print('  pending_actions: [' + ', '.join([str(action) for action in agent.pending_actions]) + ']')
+
+
+def format_state(state):
+    # Show the type of the most recent time step
+    if len(state) == 0:
+        return []
+    elif len(state) == 1:
+        return '[' + show(state[0].ty) + ']'
+    else:
+        return '[..., ' + show(state[-1].ty) + ']'
 
 
 def main():
